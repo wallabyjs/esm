@@ -1,4 +1,7 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
+require("module").Module._extensions[".js"] = function (module, filename) {
+  module._compile(require("fs").readFileSync(filename, "utf8"), filename)
+}
 
 const globalThis = (function () {
   // Reference `this` before `Function()` to prevent CSP errors for unsafe-eval.
