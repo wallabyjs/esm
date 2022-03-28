@@ -31,6 +31,9 @@ function makeRequireFunction(mod, requirer, resolver) {
   const isOwn = isOwnModule(mod)
 
   let req = function require(request) {
+    if (request.startsWith("node:")) {
+      request = request.substr(5)
+    }
     const exported = isOwn
       ? ownRequire(request)
       : void 0

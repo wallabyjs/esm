@@ -41,6 +41,10 @@ const {
 const resolveFilename = maskFunction(function (request, parent, isMain = false, options) {
   validateString(request, "request")
 
+  if (request.startsWith("node:")) {
+    request = request.substr(5)
+  }
+
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
