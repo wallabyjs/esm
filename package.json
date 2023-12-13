@@ -1,6 +1,6 @@
 {
   "name": "esm-wallaby",
-  "version": "3.2.26",
+  "version": "3.2.27",
   "description": "Tomorrow's ECMAScript modules today!",
   "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",

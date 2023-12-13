@@ -18,6 +18,10 @@ function init() {
 
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
 
+  if (!safeFs.Stats.prototype.isFile) {
+    safeFs.Stats.prototype.isFile = realFs.Stats.prototype.isFile
+  }
+
   return safeFs
 }
 
