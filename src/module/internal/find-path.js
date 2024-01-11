@@ -298,6 +298,19 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
     }
   }
 
+  // ! This is a very simplified implementation of finding the correct
+  // ! CJS entry point. It does not support the `exports` field full
+  // ! functionality; added to address JSDOM issue
+  // ! https://github.com/wallabyjs/quokka/issues/928
+  if (json.exports && json.exports.require) {
+    fieldValue = json.exports.require
+    foundPath = tryField(dirPath, fieldValue, exts, isMain)
+
+    if (foundPath !== "" && ! isExtMJS(foundPath)) {
+      return foundPath
+    }
+  }
+
   const jsonPath = dirPath + sep + "package.json"
 
   foundPath = tryExtensions(dirPath + sep + "index", exts, isMain)

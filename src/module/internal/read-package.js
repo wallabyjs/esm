@@ -5,8 +5,6 @@ import shared from "../../shared.js"
 import toExternalError from "../../util/to-external-error.js"
 
 function init() {
-  const mainFieldRegExp = /"main"/
-
   function readPackage(dirPath, fields) {
     const cache = shared.memoize.moduleInternalReadPackage
 
@@ -32,10 +30,7 @@ function init() {
     const jsonContent = readFile(jsonPath, "utf8")
 
     if (jsonContent === null ||
-        jsonContent === "" ||
-        (fieldsLength === 1 &&
-         fields[0] === "main" &&
-         ! mainFieldRegExp.test(jsonContent))) {
+        jsonContent === "") {
       return null
     }
 
