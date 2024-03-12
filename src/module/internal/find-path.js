@@ -6,7 +6,8 @@ import {
   basename,
   dirname,
   resolve,
-  sep
+  sep,
+  join
 } from "../../safe/path.js"
 
 import CHAR_CODE from "../../constant/char-code.js"
@@ -14,7 +15,7 @@ import ENV from "../../constant/env.js"
 
 import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
-import { Stats } from "../../safe/fs.js"
+import { Stats, existsSync } from "../../safe/fs.js"
 
 import { emitWarning } from "../../safe/process.js"
 import errors from "../../errors.js"
@@ -302,10 +303,8 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
   // ! CJS entry point. It does not support the `exports` field full
   // ! functionality; added to address JSDOM issue
   // ! https://github.com/wallabyjs/quokka/issues/928
-  if (json.exports && json.exports.require) {
-    fieldValue = json.exports.require
-    foundPath = tryField(dirPath, fieldValue, exts, isMain)
-
+  if (json.exports) {
+    foundPath = resolveExports(json.exports, dirPath, request.substring(dirPath.length + 1))
     if (foundPath !== "" && ! isExtMJS(foundPath)) {
       return foundPath
     }
@@ -330,6 +329,70 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
   }
 
   return foundPath
+}
+
+function resolveExports(
+  exports,
+  packagePath,
+  subpath
+) {
+  if (typeof exports === "string") {
+    return join(packagePath, exports)
+  }
+
+  if (Array.isArray(exports)) {
+    const availableExport = exports.find((exportPath) =>
+      existsSync(join(packagePath, exportPath))
+    )
+    if (availableExport) {
+      return join(packagePath, availableExport)
+    }
+    return null
+  }
+
+  if (exports.require) {
+    return resolveExports(exports.require, packagePath, subpath)
+  }
+
+  if (exports.node) {
+    return resolveExports(exports.node, packagePath, subpath)
+  }
+
+  if (exports.default) {
+    return resolveExports(exports.default, packagePath, subpath)
+  }
+
+  if (exports["."] && !subpath) {
+    return resolveExports(exports["."], packagePath, subpath)
+  }
+
+  const wellKnownConditions = ["import", "require", "node", "default", "."]
+  const conditions = Object.keys(exports)
+    .filter((condition) => !wellKnownConditions.includes(condition))
+    .map((condition) => {
+      const [startsWith, endsWith] = condition.split("*")
+      return { endsWith, exports: exports[condition], startsWith }
+    })
+
+  if (subpath) {
+     // Ensure the subpath format is correct
+    const normalizedSubpath = `./${subpath}`
+
+    const matchedCondition = conditions.find(
+      ({ startsWith, endsWith }) =>
+        normalizedSubpath.startsWith(startsWith) &&
+        (!endsWith || normalizedSubpath.endsWith(endsWith))
+    )
+    if (matchedCondition) {
+      if (matchedCondition.endsWith && typeof matchedCondition.exports === "string") {
+        const pathToReplace = normalizedSubpath.substring(matchedCondition.startsWith.length, normalizedSubpath.length - matchedCondition.endsWith.length)
+        return join(packagePath, matchedCondition.exports.replace("*", pathToReplace))
+      }
+      return resolveExports(matchedCondition.exports, packagePath, subpath)
+    }
+  }
+
+  return null
 }
 
 export default findPath

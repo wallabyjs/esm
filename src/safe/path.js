@@ -16,7 +16,8 @@ export const {
   relative,
   resolve,
   sep,
-  toNamespacedPath
+  toNamespacedPath,
+  join
 } = safePath
 
 export default safePath

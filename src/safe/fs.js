@@ -41,7 +41,8 @@ export const {
   Stats,
   statSync,
   unlinkSync,
-  writeFileSync
+  writeFileSync,
+  existsSync
 } = safeFs
 
 export default safeFs
