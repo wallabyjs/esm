@@ -1,4 +1,6 @@
 import { Stats } from "../safe/fs.js"
+import safeProcess from "../safe/process.js"
+import { gte  } from "semver"
 
 import binding from "../binding.js"
 import shared from "../shared.js"
@@ -9,6 +11,7 @@ function init() {
   const { isFile } = Stats.prototype
 
   let useFastPath
+  let twoArgsInternalModuleStat = gte(safeProcess.versions.node, "22.10.0")
 
   function statFast(thePath) {
     if (typeof thePath !== "string") {
@@ -67,7 +70,7 @@ function init() {
     // 1 when it's a directory, or a negative number on error (usually ENOENT).
     // The speedup comes from not creating thousands of Stat and Error objects.
     const result = typeof thePath === "string"
-      ? binding.fs.internalModuleStat(toNamespacedPath(thePath))
+      ? twoArgsInternalModuleStat ? binding.fs.internalModuleStat(binding.fs, toNamespacedPath(thePath)) : binding.fs.internalModuleStat(toNamespacedPath(thePath))
       : -1
 
     return result < 0 ? -1 : result
