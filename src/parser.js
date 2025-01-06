@@ -32,7 +32,7 @@ function init() {
   const defaultOptions = {
     allowAwaitOutsideFunction: true,
     allowReturnOutsideFunction: false,
-    ecmaVersion: 13,
+    ecmaVersion: "latest",
     sourceType: "module",
     strict: void 0
   }
