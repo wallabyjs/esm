@@ -39,7 +39,7 @@ function init() {
     return Parser.create("", {
       allowAwaitOutsideFunction: true,
       allowReturnOutsideFunction: true,
-      ecmaVersion: 12
+      ecmaVersion: 13
     })
   }
 

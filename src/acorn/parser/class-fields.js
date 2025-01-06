@@ -54,6 +54,10 @@ function init() {
       return Reflect.apply(func, this, args)
     }
 
+    if (branched1Type === tt.braceL && this.isContextual("static")) {
+      return Reflect.apply(func, this, args)
+    }
+
     if (branched1Type !== tt.braceR &&
         branched1Type !== tt.eq &&
         branched1Type !== tt.semi) {
