@@ -1,6 +1,6 @@
 import { Stats } from "../safe/fs.js"
 import safeProcess from "../safe/process.js"
-import { gte  } from "semver"
+import { gte, lt  } from "semver"
 
 import binding from "../binding.js"
 import shared from "../shared.js"
@@ -11,7 +11,7 @@ function init() {
   const { isFile } = Stats.prototype
 
   let useFastPath
-  let twoArgsInternalModuleStat = gte(safeProcess.versions.node, "22.10.0")
+  let twoArgsInternalModuleStat = gte(safeProcess.versions.node, "22.10.0") && lt(safeProcess.versions.node, "24.0.0")
 
   function statFast(thePath) {
     if (typeof thePath !== "string") {
