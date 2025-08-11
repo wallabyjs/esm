@@ -11,7 +11,11 @@ function init() {
   const { isFile } = Stats.prototype
 
   let useFastPath
-  let twoArgsInternalModuleStat = gte(safeProcess.versions.node, "22.10.0") && lt(safeProcess.versions.node, "24.0.0")
+  let twoArgsInternalModuleStat = (
+    gte(safeProcess.versions.node, "22.10.0") && lt(safeProcess.versions.node, "22.18.0")
+  ) || (
+    gte(safeProcess.versions.node, "23.0.0") && lt(safeProcess.versions.node, "24.0.0")
+  )
 
   function statFast(thePath) {
     if (typeof thePath !== "string") {
